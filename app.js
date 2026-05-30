@@ -64,6 +64,11 @@ let currentUsername   = null; // current player username
 let sessionPlayers    = {}; // { userId: { name, status } }
 let sessionRolls      = []; // array of { username, sides, count, rolls, timestamp }
 
+// History trees: [ { id, sides, entries: [ { rolls, timestamp } ] } ]
+// entries[0] = fresh roll, entries[1+] = re-rolls
+let historyTrees   = [];
+let currentTreeId  = null; // id of the tree the current roll belongs to
+
 // --- Initialization ----------------------------------------------------------
 
 // Restore light-mode preference on load
@@ -511,7 +516,7 @@ function createUnresolvedDice(count) {
 
 // --- Roll logic --------------------------------------------------------------
 
-function runRoll(count, sides, fixedRolls = null) {
+function runRoll(count, sides, fixedRolls = null, isReroll = false) {
   isAnimating       = true;
   skipAnimation     = false;
   pendingAnimations = [];
@@ -544,7 +549,7 @@ function runRoll(count, sides, fixedRolls = null) {
     });
 
     rollSummaryEl.textContent = count + 'd' + sides;
-    addHistoryEntry(count, sides, rolls);
+    addHistoryEntry(sides, rolls, isReroll);
 
     // Reveal dice one at a time with staggered delays
     let revealed = 0;
@@ -578,17 +583,17 @@ function roll() {
   const existing   = resolved + unresolved;
 
   if (existing > 0) {
-    runRoll(existing, currentSides);
+    runRoll(existing, currentSides, null, true);
   } else {
     const count = Math.max(1, Math.min(100, parseInt(diceCount.value, 10) || 1));
     const sides = parseInt(diceType.value, 10);
     currentSides = sides;
-    runRoll(count, sides);
+    runRoll(count, sides, null, false);
   }
 }
 
 /** Instantly displays a past roll from history, cancelling any in-flight animation. */
-function recallRolls(rolls, sides) {
+function recallRolls(rolls, sides, treeId = null) {
   isAnimating       = false;
   skipAnimation     = false;
   pendingAnimations = [];
@@ -596,7 +601,8 @@ function recallRolls(rolls, sides) {
   rollBtn.disabled = false;
   rollBtn.classList.remove('rolling');
 
-  currentSides = sides;
+  currentSides  = sides;
+  currentTreeId = treeId;
   const maxVal = Math.max(...rolls);
   const minVal = Math.min(...rolls);
 
@@ -627,19 +633,6 @@ function recallRolls(rolls, sides) {
 
 // --- History -----------------------------------------------------------------
 
-function addHistoryEntry(count, sides, rolls) {
-  const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const li = document.createElement('li');
-  li.innerHTML = '<span>' + count + 'd' + sides + ': ' + formatRollsForHistory(rolls) + '</span>'
-    + '<span class="h-total">' + count + '</span>'
-    + '<span class="h-time">' + timeStr + '</span>';
-  li.title = 'Click to recall this roll';
-  li.addEventListener('click', () => recallRolls(rolls, sides));
-  historyEl.prepend(li);
-  while (historyEl.children.length > 20) historyEl.lastChild.remove();
-  historyClearBtn.disabled = false;
-}
-
 function formatRollsForHistory(rolls) {
   const counts = new Map();
   rolls.forEach(v => counts.set(v, (counts.get(v) || 0) + 1));
@@ -647,6 +640,88 @@ function formatRollsForHistory(rolls) {
     .sort(([a], [b]) => a - b)
     .map(([v, c]) => c + 'x' + v)
     .join('  ');
+}
+
+function addHistoryEntry(sides, rolls, isReroll) {
+  const entry = { rolls, timestamp: Date.now() };
+
+  if (isReroll && currentTreeId !== null) {
+    // Append to the existing tree
+    const tree = historyTrees.find(t => t.id === currentTreeId);
+    if (tree) {
+      tree.entries.push(entry);
+      // Cap entries per tree at 10
+      if (tree.entries.length > 10) tree.entries.shift();
+    }
+  } else {
+    // Fresh roll — start a new tree
+    const tree = {
+      id: Date.now(),
+      sides,
+      entries: [entry],
+    };
+    historyTrees.unshift(tree);
+    currentTreeId = tree.id;
+    // Cap total trees at 20
+    if (historyTrees.length > 20) historyTrees.pop();
+  }
+
+  renderHistory();
+  historyClearBtn.disabled = false;
+}
+
+function renderHistory() {
+  historyEl.innerHTML = '';
+
+  historyTrees.forEach(tree => {
+    const latest  = tree.entries[tree.entries.length - 1];
+    const count   = latest.rolls.length;
+    const timeStr = new Date(latest.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const isOpen  = tree.id === currentTreeId;
+
+    const details = document.createElement('details');
+    details.className = 'h-tree';
+    if (isOpen) details.open = true;
+
+    // Summary row — clicking the label restores the latest roll
+    const summary = document.createElement('summary');
+    summary.className = 'h-tree-summary';
+    summary.innerHTML =
+      '<span class="h-tree-label">' + count + 'd' + tree.sides + '</span>'
+      + '<span class="h-tree-desc">' + formatRollsForHistory(latest.rolls) + '</span>'
+      + '<span class="h-time">' + timeStr + '</span>';
+    summary.title = 'Click to expand/collapse; label recalls latest roll';
+
+    // Clicking the label part recalls without toggling open/close
+    summary.querySelector('.h-tree-label').addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      recallRolls(latest.rolls, tree.sides, tree.id);
+    });
+    summary.querySelector('.h-tree-desc').addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      recallRolls(latest.rolls, tree.sides, tree.id);
+    });
+
+    details.appendChild(summary);
+
+    // Child entries (shown when expanded)
+    tree.entries.forEach((entry, idx) => {
+      const li = document.createElement('div');
+      li.className = 'h-entry' + (idx === tree.entries.length - 1 ? ' h-entry--latest' : '');
+      const entryTime = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      li.innerHTML =
+        '<span class="h-entry-label">' + (idx === 0 ? 'Roll' : 'Re-roll ' + idx) + '</span>'
+        + '<span class="h-entry-desc">' + formatRollsForHistory(entry.rolls) + '</span>'
+        + '<span class="h-time">' + entryTime + '</span>';
+      li.title = 'Restore this roll';
+      li.addEventListener('click', () => recallRolls(entry.rolls, tree.sides, tree.id));
+      details.appendChild(li);
+    });
+
+    historyEl.appendChild(details);
+  });
 }
 
 // --- Event listeners ---------------------------------------------------------
@@ -795,6 +870,8 @@ poolIncBtn.addEventListener('click', () => { poolCount++; updatePoolDisplay(); }
 
 // History
 historyClearBtn.addEventListener('click', () => {
+  historyTrees  = [];
+  currentTreeId = null;
   historyEl.innerHTML = '';
   historyClearBtn.disabled = true;
 });
