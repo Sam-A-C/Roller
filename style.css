@@ -347,30 +347,6 @@
   opacity: 0.7;
 }
 
-@media (max-width: 600px) {
-  .session-sidebar {
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 250px;
-    height: 100vh;
-    max-height: none;
-    border-radius: 0;
-    border-left: 1px solid var(--card);
-    border-right: none;
-    border-top: none;
-    border-bottom: none;
-    z-index: 150;
-  }
-
-  .layout {
-    gap: 0 !important;
-  }
-
-  .roll-zone {
-    width: 100%;
-  }
-}
 
 .light-mode {
   --bg: #f0f0eb;
@@ -401,24 +377,10 @@ body {
   gap: 1.5rem;
 }
 
-.layout {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-}
-
 .roll-zone {
-  flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-}
-
-@media (max-width: 600px) {
-  .layout {
-    flex-direction: column;
-  }
 }
 
 /* Roll header — fixed-width controls + roll button */
@@ -527,10 +489,50 @@ body {
   margin: 0 auto;
 }
 
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 h1 {
   font-size: 2rem;
   letter-spacing: 0.04em;
 }
+
+.home-nav-btn {
+  background: var(--surface);
+  border: 1px solid var(--card);
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.home-nav-btn:hover { background: var(--card); color: var(--text); }
+
+.session-nav-btn {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.session-nav-btn:hover { background: var(--accent); color: #fff; }
 
 .settings-btn {
   background: var(--surface);

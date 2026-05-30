@@ -13,16 +13,17 @@ const joinError        = document.getElementById('joinError');
 
 // App
 const appContainer     = document.querySelector('.app');
+const homeBtn          = document.getElementById('homeBtn');
 
-// Session sidebar
-const sessionSidebar   = document.getElementById('sessionSidebar');
+// Session panel
+const sessionBtn       = document.getElementById('sessionBtn');
+const sessionOverlay   = document.getElementById('sessionOverlay');
+const sessionCloseBtn  = document.getElementById('sessionCloseBtn');
 const sessionTokenDisplay = document.getElementById('sessionTokenDisplay');
 const copyTokenBtn     = document.getElementById('copyTokenBtn');
 const sessionPlayersList = document.getElementById('sessionPlayersList');
 const sessionRollsList  = document.getElementById('sessionRollsList');
 const exitSessionBtn   = document.getElementById('exitSessionBtn');
-const settingsSessionSection = document.getElementById('settingsSessionSection');
-const settingsExitSessionBtn = document.getElementById('settingsExitSessionBtn');
 
 // Roll button and related
 const rollBtn         = document.getElementById('rollBtn');
@@ -87,15 +88,18 @@ function initializeMode() {
 function showHomeScreen() {
   homeScreen.classList.remove('hidden');
   appContainer.classList.add('hidden');
-  sessionSidebar.classList.add('hidden');
+  sessionOverlay.classList.add('hidden');
   appMode = null;
 }
 
 function showApp() {
   homeScreen.classList.add('hidden');
   appContainer.classList.remove('hidden');
+  // Show session button in header if in session mode
   if (appMode === 'session') {
-    sessionSidebar.classList.remove('hidden');
+    sessionBtn.classList.remove('hidden');
+  } else {
+    sessionBtn.classList.add('hidden');
   }
 }
 
@@ -734,7 +738,8 @@ function doExitSession() {
   sessionStorage.removeItem('appMode');
   sessionStorage.removeItem('currentUsername');
   sessionStorage.removeItem('sessionId');
-  sessionSidebar.classList.add('hidden');
+  sessionOverlay.classList.add('hidden');
+  sessionBtn.classList.add('hidden');
   sessionPlayersList.innerHTML = '';
   sessionRollsList.innerHTML = '';
   settingsOverlay.classList.add('hidden');
@@ -742,10 +747,6 @@ function doExitSession() {
 }
 
 exitSessionBtn.addEventListener('click', () => {
-  if (confirm('Leave session?')) doExitSession();
-});
-
-settingsExitSessionBtn.addEventListener('click', () => {
   if (confirm('Leave session?')) doExitSession();
 });
 
@@ -798,22 +799,34 @@ historyClearBtn.addEventListener('click', () => {
   historyClearBtn.disabled = true;
 });
 
-// Settings
-settingsBtn.addEventListener('click', () => {
-  settingsOverlay.classList.remove('hidden');
-  // Show exit session option only when in a session
+// Home button
+homeBtn.addEventListener('click', () => {
   if (appMode === 'session') {
-    settingsSessionSection.classList.remove('hidden');
+    if (confirm('Leave session and return to home?')) doExitSession();
   } else {
-    settingsSessionSection.classList.add('hidden');
+    sessionStorage.removeItem('appMode');
+    showHomeScreen();
   }
 });
+
+// Session panel
+sessionBtn.addEventListener('click', () => sessionOverlay.classList.remove('hidden'));
+sessionCloseBtn.addEventListener('click', () => sessionOverlay.classList.add('hidden'));
+sessionOverlay.addEventListener('click', e => {
+  if (e.target === sessionOverlay) sessionOverlay.classList.add('hidden');
+});
+
+// Settings
+settingsBtn.addEventListener('click', () => settingsOverlay.classList.remove('hidden'));
 settingsCloseBtn.addEventListener('click', () => settingsOverlay.classList.add('hidden'));
 settingsOverlay.addEventListener('click',  e => {
   if (e.target === settingsOverlay) settingsOverlay.classList.add('hidden');
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') settingsOverlay.classList.add('hidden');
+  if (e.key === 'Escape') {
+    settingsOverlay.classList.add('hidden');
+    sessionOverlay.classList.add('hidden');
+  }
 });
 
 lightModeToggle.addEventListener('change', () => {

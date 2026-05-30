@@ -39,72 +39,83 @@
 
   <div class="app hidden">
     <div class="app-header">
+      <button id="homeBtn" class="home-nav-btn" title="Back to home">&#8592;</button>
       <h1>Dice Roller</h1>
-      <button id="settingsBtn" class="settings-btn" title="Settings">&#9881;</button>
+      <div class="app-header-actions">
+        <button id="sessionBtn" class="session-nav-btn hidden" title="Session">&#128101;</button>
+        <button id="settingsBtn" class="settings-btn" title="Settings">&#9881;</button>
+      </div>
     </div>
 
-    <div class="layout">
-      <div id="sessionSidebar" class="session-sidebar hidden">
-        <div class="session-header">
-          <span class="session-title">Session</span>
-          <button id="exitSessionBtn" class="session-close-btn" title="Leave session">✕</button>
-        </div>
-        <div class="session-token-section">
-          <div class="session-token-label">Token</div>
-          <div class="session-token-row">
-            <code id="sessionTokenDisplay" class="session-token"></code>
-            <button id="copyTokenBtn" class="copy-btn" title="Copy token">📋</button>
+    <div class="roll-zone">
+      <div class="roll-zone-top">
+        <div class="roll-header">
+          <div class="controls">
+            <label>
+              Number of dice
+              <input id="diceCount" type="number" min="1" max="100" value="20" />
+            </label>
           </div>
+
+          <button id="rollBtn" class="roll-btn">Roll</button>
         </div>
-        <div class="session-players-section">
-          <div class="session-players-label">Players</div>
-          <ul id="sessionPlayersList" class="session-players-list"></ul>
-        </div>
-        <div class="session-rolls-section">
-          <div class="session-rolls-label">Recent Rolls</div>
-          <ul id="sessionRollsList" class="session-rolls-list"></ul>
+
+        <div class="side-pool">
+          <div class="pool-title">Side Pool</div>
+          <div class="pool-count-row">
+            <button class="pool-adj-btn" id="poolDecBtn">−</button>
+            <span class="pool-number" id="poolNumber">0</span>
+            <button class="pool-adj-btn" id="poolIncBtn">+</button>
+            <span class="pool-label">dice</span>
+          </div>
+          <div class="pool-actions">
+            <button id="poolAddBtn" class="pool-btn" disabled>Add to roll</button>
+            <button id="poolReplaceBtn" class="pool-btn pool-btn--replace" disabled>Replace roll</button>
+          </div>
         </div>
       </div>
 
-      <div class="roll-zone">
-        <div class="roll-zone-top">
-          <div class="roll-header">
-            <div class="controls">
-              <label>
-                Number of dice
-                <input id="diceCount" type="number" min="1" max="100" value="20" />
-              </label>
-            </div>
-
-            <button id="rollBtn" class="roll-btn">Roll</button>
-          </div>
-
-          <div class="side-pool">
-            <div class="pool-title">Side Pool</div>
-            <div class="pool-count-row">
-              <button class="pool-adj-btn" id="poolDecBtn">−</button>
-              <span class="pool-number" id="poolNumber">0</span>
-              <button class="pool-adj-btn" id="poolIncBtn">+</button>
-              <span class="pool-label">dice</span>
-            </div>
-            <div class="pool-actions">
-              <button id="poolAddBtn" class="pool-btn" disabled>Add to roll</button>
-              <button id="poolReplaceBtn" class="pool-btn pool-btn--replace" disabled>Replace roll</button>
-            </div>
-          </div>
+      <div id="results" class="results hidden">
+        <div id="rollSummary" class="roll-summary"></div>
+        <div id="unresolvedArea" class="unresolved-area hidden"></div>
+        <div id="diceGrid" class="dice-grid"></div>
+        <div class="total-row">
+          Total dice: <span id="total" class="total">—</span>
         </div>
+        <button id="resetBtn" class="reset-btn hidden">Reset</button>
+      </div>
+    </div>
+  </div>
 
-        <div id="results" class="results hidden">
-          <div id="rollSummary" class="roll-summary"></div>
-          <div id="unresolvedArea" class="unresolved-area hidden"></div>
-          <div id="diceGrid" class="dice-grid"></div>
-          <div class="total-row">
-            Total dice: <span id="total" class="total">—</span>
-          </div>
-          <button id="resetBtn" class="reset-btn hidden">Reset</button>
+  <!-- Session panel overlay -->
+  <div id="sessionOverlay" class="settings-overlay hidden">
+    <div class="settings-panel">
+      <div class="settings-header">
+        <span class="settings-title">Session</span>
+        <button id="sessionCloseBtn" class="settings-close-btn">&#x2715;</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="session-token-label">Token</div>
+        <div class="session-token-row">
+          <code id="sessionTokenDisplay" class="session-token"></code>
+          <button id="copyTokenBtn" class="copy-btn" title="Copy token">📋</button>
         </div>
       </div>
 
+      <div class="settings-section">
+        <div class="session-players-label">Players</div>
+        <ul id="sessionPlayersList" class="session-players-list"></ul>
+      </div>
+
+      <div class="settings-section">
+        <div class="session-rolls-label">Recent Rolls</div>
+        <ul id="sessionRollsList" class="session-rolls-list"></ul>
+      </div>
+
+      <div class="settings-section">
+        <button id="exitSessionBtn" class="settings-exit-session-btn">Exit Session</button>
+      </div>
     </div>
   </div>
 
@@ -139,11 +150,6 @@
             <option value="100">d100</option>
           </select>
         </label>
-      </div>
-
-      <div id="settingsSessionSection" class="settings-section hidden">
-        <div class="settings-section-title">Session</div>
-        <button id="settingsExitSessionBtn" class="settings-exit-session-btn">Exit Session</button>
       </div>
 
       <div class="settings-section">
