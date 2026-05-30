@@ -12,11 +12,20 @@ function createSession() {
   const token = generateToken();
   sessions[token] = {
     id: uuidv4(),
-    players: {}, // { socketId: { name, joinedAt, lastActive } }
-    rolls: [], // [ { username, sides, count, rolls: [], timestamp } ]
+    players: {},
+    rolls: [],
     createdAt: Date.now(),
   };
   return token;
+}
+
+function createSessionWithToken(token) {
+  sessions[token.toUpperCase()] = {
+    id: uuidv4(),
+    players: {},
+    rolls: [],
+    createdAt: Date.now(),
+  };
 }
 
 function joinSession(token, socketId, username) {
@@ -84,6 +93,7 @@ function sessionExists(token) {
 
 module.exports = {
   createSession,
+  createSessionWithToken,
   joinSession,
   leaveSession,
   addRoll,

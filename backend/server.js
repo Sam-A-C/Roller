@@ -37,11 +37,12 @@ io.on('connection', (socket) => {
 
   // Join an existing session
   socket.on('session:join', (data, callback) => {
-    const { token, username } = data;
+    const { token: rawToken, username } = data;
+    const token = rawToken.toUpperCase();
 
+    // Auto-create session if it doesn't exist yet (first player creates it)
     if (!sessionManager.sessionExists(token)) {
-      callback({ success: false, error: 'Session not found' });
-      return;
+      sessionManager.createSessionWithToken(token);
     }
 
     const sessionData = sessionManager.joinSession(token, socket.id, username);
