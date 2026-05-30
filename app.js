@@ -685,7 +685,7 @@ joinConfirmBtn.addEventListener('click', () => {
 
   // Initialize Socket.io and join session
   if (!window.socket) {
-    initializeSocket('https://roller.onrender.com').then(() => {
+    initializeSocket('https://roller-br4m.onrender.com').then(() => {
       joinSessionSocket(token, user);
     }).catch(err => {
       joinError.textContent = 'Failed to connect to server';
