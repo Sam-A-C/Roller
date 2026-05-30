@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dice Roller</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="homeScreen" class="home-screen">
+    <div class="home-container">
+      <h1 class="home-title">Dice Roller</h1>
+      <p class="home-subtitle">Roll dice alone or with friends</p>
+      <div class="home-buttons">
+        <button id="soloBtn" class="home-btn home-btn--primary">Play Solo</button>
+        <button id="joinSessionBtn" class="home-btn home-btn--secondary">Join Session</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="joinModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Join a Session</h2>
+      <div class="modal-field">
+        <label for="sessionToken">Session Token</label>
+        <input id="sessionToken" type="text" placeholder="e.g., abc123" autocomplete="off" />
+      </div>
+      <div class="modal-field">
+        <label for="username">Your Name</label>
+        <input id="username" type="text" placeholder="Enter your name" autocomplete="off" />
+      </div>
+      <div class="modal-actions">
+        <button id="joinConfirmBtn" class="modal-btn">Join</button>
+        <button id="joinCancelBtn" class="modal-btn modal-btn--secondary">Cancel</button>
+      </div>
+      <div id="joinError" class="modal-error hidden"></div>
+    </div>
+  </div>
+
+  <div class="app hidden">
+    <div class="app-header">
+      <h1>Dice Roller</h1>
+      <button id="settingsBtn" class="settings-btn" title="Settings">&#9881;</button>
+    </div>
+
+    <div class="layout">
+      <div id="sessionSidebar" class="session-sidebar hidden">
+        <div class="session-header">
+          <span class="session-title">Session</span>
+          <button id="exitSessionBtn" class="session-close-btn" title="Leave session">✕</button>
+        </div>
+        <div class="session-token-section">
+          <div class="session-token-label">Token</div>
+          <div class="session-token-row">
+            <code id="sessionTokenDisplay" class="session-token"></code>
+            <button id="copyTokenBtn" class="copy-btn" title="Copy token">📋</button>
+          </div>
+        </div>
+        <div class="session-players-section">
+          <div class="session-players-label">Players</div>
+          <ul id="sessionPlayersList" class="session-players-list"></ul>
+        </div>
+        <div class="session-rolls-section">
+          <div class="session-rolls-label">Recent Rolls</div>
+          <ul id="sessionRollsList" class="session-rolls-list"></ul>
+        </div>
+      </div>
+
+      <div class="roll-zone">
+        <div class="roll-zone-top">
+          <div class="roll-header">
+            <div class="controls">
+              <label>
+                Number of dice
+                <input id="diceCount" type="number" min="1" max="100" value="20" />
+              </label>
+            </div>
+
+            <button id="rollBtn" class="roll-btn">Roll</button>
+          </div>
+
+          <div class="side-pool">
+            <div class="pool-title">Side Pool</div>
+            <div class="pool-count-row">
+              <button class="pool-adj-btn" id="poolDecBtn">−</button>
+              <span class="pool-number" id="poolNumber">0</span>
+              <button class="pool-adj-btn" id="poolIncBtn">+</button>
+              <span class="pool-label">dice</span>
+            </div>
+            <div class="pool-actions">
+              <button id="poolAddBtn" class="pool-btn" disabled>Add to roll</button>
+              <button id="poolReplaceBtn" class="pool-btn pool-btn--replace" disabled>Replace roll</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="results" class="results hidden">
+          <div id="rollSummary" class="roll-summary"></div>
+          <div id="unresolvedArea" class="unresolved-area hidden"></div>
+          <div id="diceGrid" class="dice-grid"></div>
+          <div class="total-row">
+            Total dice: <span id="total" class="total">—</span>
+          </div>
+          <button id="resetBtn" class="reset-btn hidden">Reset</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="settingsOverlay" class="settings-overlay hidden">
+    <div class="settings-panel">
+      <div class="settings-header">
+        <span class="settings-title">Settings</span>
+        <button id="settingsCloseBtn" class="settings-close-btn">&#x2715;</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Appearance</div>
+        <label class="settings-toggle-label">
+          Light mode
+          <input type="checkbox" id="lightModeToggle" class="settings-toggle-input" />
+          <span class="settings-toggle-track"></span>
+        </label>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Die Type</div>
+        <label class="settings-die-label">
+          Sides per die
+          <select id="diceType">
+            <option value="3">d3</option>
+            <option value="4">d4</option>
+            <option value="6" selected>d6</option>
+            <option value="8">d8</option>
+            <option value="10">d10</option>
+            <option value="12">d12</option>
+            <option value="20">d20</option>
+            <option value="100">d100</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-header">
+          <span class="settings-section-title">History</span>
+          <button id="historyClearBtn" class="history-clear-btn" disabled>Clear</button>
+        </div>
+        <ul id="history" class="history"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="socket-client.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
