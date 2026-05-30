@@ -911,6 +911,23 @@ h1 {
   letter-spacing: 0.06em;
 }
 
+.settings-exit-session-btn {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  width: 100%;
+}
+.settings-exit-session-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
 .history-clear-btn {
   background: none;
   border: none;

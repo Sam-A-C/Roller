@@ -21,6 +21,8 @@ const copyTokenBtn     = document.getElementById('copyTokenBtn');
 const sessionPlayersList = document.getElementById('sessionPlayersList');
 const sessionRollsList  = document.getElementById('sessionRollsList');
 const exitSessionBtn   = document.getElementById('exitSessionBtn');
+const settingsSessionSection = document.getElementById('settingsSessionSection');
+const settingsExitSessionBtn = document.getElementById('settingsExitSessionBtn');
 
 // Roll button and related
 const rollBtn         = document.getElementById('rollBtn');
@@ -724,20 +726,27 @@ function joinSessionSocket(token, user) {
   });
 }
 
+function doExitSession() {
+  disconnectSession();
+  appMode = 'solo';
+  currentUsername = null;
+  sessionId = null;
+  sessionStorage.removeItem('appMode');
+  sessionStorage.removeItem('currentUsername');
+  sessionStorage.removeItem('sessionId');
+  sessionSidebar.classList.add('hidden');
+  sessionPlayersList.innerHTML = '';
+  sessionRollsList.innerHTML = '';
+  settingsOverlay.classList.add('hidden');
+  showHomeScreen();
+}
+
 exitSessionBtn.addEventListener('click', () => {
-  if (confirm('Leave session?')) {
-    disconnectSession();
-    appMode = 'solo';
-    currentUsername = null;
-    sessionId = null;
-    sessionStorage.removeItem('appMode');
-    sessionStorage.removeItem('currentUsername');
-    sessionStorage.removeItem('sessionId');
-    sessionSidebar.classList.add('hidden');
-    sessionPlayersList.innerHTML = '';
-    sessionRollsList.innerHTML = '';
-    showHomeScreen();
-  }
+  if (confirm('Leave session?')) doExitSession();
+});
+
+settingsExitSessionBtn.addEventListener('click', () => {
+  if (confirm('Leave session?')) doExitSession();
 });
 
 copyTokenBtn.addEventListener('click', () => {
@@ -790,7 +799,15 @@ historyClearBtn.addEventListener('click', () => {
 });
 
 // Settings
-settingsBtn.addEventListener('click',      () => settingsOverlay.classList.remove('hidden'));
+settingsBtn.addEventListener('click', () => {
+  settingsOverlay.classList.remove('hidden');
+  // Show exit session option only when in a session
+  if (appMode === 'session') {
+    settingsSessionSection.classList.remove('hidden');
+  } else {
+    settingsSessionSection.classList.add('hidden');
+  }
+});
 settingsCloseBtn.addEventListener('click', () => settingsOverlay.classList.add('hidden'));
 settingsOverlay.addEventListener('click',  e => {
   if (e.target === settingsOverlay) settingsOverlay.classList.add('hidden');
