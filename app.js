@@ -14,6 +14,9 @@ const joinError        = document.getElementById('joinError');
 // App
 const appContainer     = document.querySelector('.app');
 const homeBtn          = document.getElementById('homeBtn');
+const historyBtn       = document.getElementById('historyBtn');
+const historyOverlay   = document.getElementById('historyOverlay');
+const historyCloseBtn  = document.getElementById('historyCloseBtn');
 
 // Session panel
 const sessionBtn       = document.getElementById('sessionBtn');
@@ -868,7 +871,13 @@ poolReplaceBtn.addEventListener('click', () => {
 poolDecBtn.addEventListener('click', () => { if (poolCount > 0) { poolCount--; updatePoolDisplay(); } });
 poolIncBtn.addEventListener('click', () => { poolCount++; updatePoolDisplay(); });
 
-// History
+// History panel
+historyBtn.addEventListener('click',      () => historyOverlay.classList.remove('hidden'));
+historyCloseBtn.addEventListener('click', () => historyOverlay.classList.add('hidden'));
+historyOverlay.addEventListener('click',  e => {
+  if (e.target === historyOverlay) historyOverlay.classList.add('hidden');
+});
+
 historyClearBtn.addEventListener('click', () => {
   historyTrees  = [];
   currentTreeId = null;
@@ -903,6 +912,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     settingsOverlay.classList.add('hidden');
     sessionOverlay.classList.add('hidden');
+    historyOverlay.classList.add('hidden');
   }
 });
 

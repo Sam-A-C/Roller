@@ -42,6 +42,7 @@
       <button id="homeBtn" class="home-nav-btn" title="Back to home">&#8592;</button>
       <h1>Dice Roller</h1>
       <div class="app-header-actions">
+        <button id="historyBtn" class="history-nav-btn" title="History">&#128221;</button>
         <button id="sessionBtn" class="session-nav-btn hidden" title="Session">&#128101;</button>
         <button id="settingsBtn" class="settings-btn" title="Settings">&#9881;</button>
       </div>
@@ -87,6 +88,18 @@
     </div>
   </div>
 
+  <!-- History panel overlay -->
+  <div id="historyOverlay" class="settings-overlay hidden">
+    <div class="settings-panel">
+      <div class="settings-header">
+        <span class="settings-title">History</span>
+        <button id="historyClearBtn" class="history-clear-btn" disabled>Clear</button>
+        <button id="historyCloseBtn" class="settings-close-btn">&#x2715;</button>
+      </div>
+      <ul id="history" class="history"></ul>
+    </div>
+  </div>
+
   <!-- Session panel overlay -->
   <div id="sessionOverlay" class="settings-overlay hidden">
     <div class="settings-panel">
@@ -119,6 +132,7 @@
     </div>
   </div>
 
+  <!-- Settings panel overlay -->
   <div id="settingsOverlay" class="settings-overlay hidden">
     <div class="settings-panel">
       <div class="settings-header">
@@ -150,14 +164,6 @@
             <option value="100">d100</option>
           </select>
         </label>
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-section-header">
-          <span class="settings-section-title">History</span>
-          <button id="historyClearBtn" class="history-clear-btn" disabled>Clear</button>
-        </div>
-        <ul id="history" class="history"></ul>
       </div>
     </div>
   </div>
